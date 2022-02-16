@@ -1,0 +1,86 @@
+<html>
+<head>
+    <title>Chat WebSocket</title>
+    <script src="/js/sockjs-0.3.4.js"></script>
+    <script src="/js/stomp.js"></script>
+    <link type="text/css" rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+<div>
+    <div>
+        <input type="text" id="from" placeholder="Choose a nickname"/>
+    </div>
+    <br/>
+    <div>
+        <button id="connect" onclick="connect();">Connect</button>
+        <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+    </div>
+    <br/>
+    <div id="conversationDiv">
+        <input type="text" id="text" placeholder="Write a message..."/>
+        <button id="sendMessage" onclick="sendMessage();">Send</button>
+        <p id="response"></p>
+    </div>
+</div>
+
+
+    <script type="text/javascript">
+        var stompClient = null;
+        
+        window.addEventListener('beforeunload', function(event) {
+            console.log('beforeunload event called');
+            disconnect();
+        });
+
+        function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
+            document.getElementById('response').innerHTML = '';
+        }
+
+        function connect() {
+            var socket = new SockJS('/push-message-mapping');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                setConnected(true);
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/request-list', function (messageOutput) {
+                    console.log("messageOutput" + messageOutput.body)
+                    var message = JSON.parse(messageOutput.body);
+                    showMessageOutput(messageOutput.body);
+                    for (var i = 0; message.length; i++) {
+                        showMessageOutput(message[i]);
+                    }
+                });
+            });
+        }
+
+        function disconnect() {
+            console.log("calling disconnect!!");
+            if (stompClient != null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+
+        function sendMessage() {
+            var from = document.getElementById('from').value;
+            var text = document.getElementById('text').value;
+            stompClient.send("/app/push-message-mapping", {}, JSON.stringify({'senderName': from, 'subject': text}));
+        }
+
+        function showMessageOutput(messageOutput) {
+            var response = document.getElementById('response');
+            var p = document.createElement('p');
+            p.style.wordWrap = 'break-word';
+            p.appendChild(document.createTextNode(messageOutput.username + ": " + messageOutput.username + ": " + messageOutput.password + messageOutput.password));
+            response.appendChild(p);
+        }
+
+    </script>
+
+</body>
+</html>

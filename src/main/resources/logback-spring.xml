@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--logback-spring.xml spring boot expects it to class path dir. you can different loc using logging.config  -->
+<configuration scan="true" scanPeriod="120 seconds">
+
+    <appender name="Last_30_Days" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <File>logs/erp_app_bk.log</File>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover since yyyy-MM-dd -->
+            <FileNamePattern>erp_app.%d{yyyy-MM-dd}.log</FileNamePattern>
+
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%date{ISO8601} %-5level [%thread] [%file:%line %M] - %msg %n</pattern>
+        </encoder>
+
+    </appender>
+    <appender name="log_to_file_daily" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <File>C:/Development/Work/notification.log</File>
+<!--        <File>${LOG_PATH}/notification.log</File>-->
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover since yyyy-MM-dd -->
+            <FileNamePattern>${LOG_PATH}/notification.%d{yyyy-MM-dd}.log</FileNamePattern>
+
+            <!-- keep 15 days' worth of history -->
+            <maxHistory>15</maxHistory>
+            <!-- single max file size use ch.qos.logback.core.rolling.SizeTimeBasedRollingPolicy
+            <maxFileSize>1MB</maxFileSize>-->
+            <!-- all file size greater remove older files -->
+            <totalSizeCap>500MB</totalSizeCap>
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%date{ISO8601} %-5level [%thread] [%file:%line %M] - %msg %n</pattern>
+        </encoder>
+
+    </appender>
+
+
+    <!--<appender name="LOGTOFILE" class="ch.qos.logback.core.FileAppender">
+
+        <file>logs/erp_app2.log</file>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%date{ISO8601} %-5level [%thread] [%file:%line %M] - %msg %n</pattern>
+        </encoder>
+
+    </appender>-->
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+
+        <encoder>
+            <pattern>%date{ISO8601} %-5level [%thread] [%file:%line %M] - %msg %n</pattern>
+        </encoder>
+
+    </appender>
+
+    <!-- Test -->
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="log_to_file_daily"/>
+    </root>
+
+</configuration>
